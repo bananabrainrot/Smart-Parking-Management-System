@@ -10,4 +10,28 @@ public class ParkingSpot {
         this.spotNumber = spotNumber;
         this.isOccupied = isOccupied;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
+    }
+
+    public String getSpotNumber() {
+        return spotNumber;
+    }
+
+    public void setSpotNumber(String spotNumber){
+        this.spotNumber = spotNumber;
+    }
+
+    public boolean isOccupied() {
+        return isOccupied;
+    }
+
+    public void setOccupied(boolean occupied) {
+         isOccupied = occupied;
+    }
 }

@@ -1,14 +1,14 @@
 package repositories.implementations;
 
-import data.IDB;
+import edu.aitu.oop3.db.*;
 import entities.Vehicle;
 import repositories.IVehicleRepository;
 import java.sql.*;
 
 public class VehicleRepositoryImpl implements IVehicleRepository {
-    private final IDB db;
+    private final DatabaseConnection db;
 
-    public VehicleRepositoryImpl(IDB db) {
+    public VehicleRepositoryImpl(DatabaseConnection db) {
         this.db = db;
     }
 

@@ -16,19 +16,47 @@ public class Reservation {
         this.startTime = startTime;
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getVehicleId() {
+
         return vehicleId;
     }
 
+    public void setVehicleId(int vehicleId) {
+        this.vehicleId = vehicleId;
+    }
+
     public int getSpotId() {
+
         return spotId;
     }
 
+    public void setSpotId(int spotId) {
+        this.spotId = spotId;
+    }
+
     public LocalDateTime getStartTime() {
+
         return startTime;
     }
 
-    public static void
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
 }

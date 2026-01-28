@@ -8,8 +8,20 @@ public class Vehicle {
         this.id = id;
         this.plateNumber = plateNumber;
     }
-    public String getPlateNumber(){
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPlateNumber() {
         return plateNumber;
     }
 
+    public void setPlateNumber(String plateNumber) {
+        this.plateNumber = plateNumber;
+    }
 }
