@@ -30,7 +30,7 @@ public class Main {
             // ...
             service.releaseSpot("123ABC01");
         } catch (Exception e) {
-            System.err.println("Ошибка: " + e.getMessage());
+            System.err.println("error: " + e.getMessage());
         }
     }
 }

@@ -32,7 +32,7 @@ public class ReservationService {
         Vehicle vehicle = vehicleRepo.findByPlate(plateNumber);
         if (vehicle != null) {
             if (reservationRepo.findActiveByVehicle(vehicle.getId()) != null) {
-                throw new ReservationActiveException("Эта машина уже припаркована!");
+                throw new ReservationActiveException();
             }
         } else {
             // Если машины нет в базе — создаем её
@@ -53,16 +53,16 @@ public class ReservationService {
         reservationRepo.create(res);
         spotRepo.updateStatus(spot.getId(), true);
 
-        System.out.println("Место " + spot.getSpotNumber() + " успешно забронировано!");
+        System.out.println("Spot " + spot.getSpotNumber() + " succesfully reserved!");
     }
 
     // Освобождение места и расчет стоимости (User Story 2 & 4)
     public void releaseSpot(String plateNumber) throws ReservationStatusException {
         Vehicle vehicle = vehicleRepo.findByPlate(plateNumber);
-        if (vehicle == null) throw new ReservationStatusException("Машина не найдена");
+        if (vehicle == null) throw new ReservationStatusException("Car is not found");
 
         Reservation activeRes = reservationRepo.findActiveByVehicle(vehicle.getId());
-        if (activeRes == null) throw new ReservationStatusException("Активная бронь отсутствует");
+        if (activeRes == null) throw new ReservationStatusException("there is no active reservation");
 
         // Расчет цены
         double rate = tariffRepo.getRateByName("Standard");
@@ -73,6 +73,6 @@ public class ReservationService {
         reservationRepo.finishReservation(activeRes.getId(), now, totalCost);
         spotRepo.updateStatus(activeRes.getSpotId(), false);
 
-        System.out.println("Парковка завершена. К оплате: " + totalCost + " тенге.");
+        System.out.println("parking ended. cost: " + totalCost);
     }
 }
