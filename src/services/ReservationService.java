@@ -1,8 +1,8 @@
 package services;
 
-import repositories.*;
 import entities.*;
 import exception.*;
+import repositories.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +13,7 @@ public class ReservationService {
     private final ITariffRepository tariffRepo;
     private final PricingService pricingService;
 
-    // SOLID: Dependency Injection через конструктор
+    // SOLID: Внедрение зависимостей через конструктор
     public ReservationService(IParkingSpotRepository spotRepo,
                               IVehicleRepository vehicleRepo,
                               IReservationRepository reservationRepo,
@@ -26,19 +26,13 @@ public class ReservationService {
         this.pricingService = pricingService;
     }
 
-    // Резервирование места (User Story 1)
-    public void reserveSpot(String plateNumber) throws NoFreeSpotsException, ReservationActiveException {
-        // 1. Проверяем, нет ли уже активной брони у этой машины
-        Vehicle vehicle = vehicleRepo.findByPlate(plateNumber);
-        if (vehicle != null) {
-            if (reservationRepo.findActiveByVehicle(vehicle.getId()) != null) {
-                throw new ReservationActiveException();
-            }
-        } else {
-            // Если машины нет в базе — создаем её
-            vehicle = new Vehicle(0, plateNumber);
-            vehicleRepo.addVehicle(vehicle);
-            vehicle = vehicleRepo.findByPlate(plateNumber); // Получаем ID из БД
+    /**
+     * User Story: Reserve a spot
+     */
+    public void reserve(String plateNumber) throws NoFreeSpotsException, InvalidVehiclePlateException {
+        // 1. Простейшая валидация номера
+        if (plateNumber == null || plateNumber.trim().isEmpty()) {
+            throw new InvalidVehiclePlateException(plateNumber);
         }
 
         // 2. Ищем свободное место
@@ -48,31 +42,43 @@ public class ReservationService {
         }
         ParkingSpot spot = freeSpots.get(0);
 
-        // 3. Создаем бронь и помечаем место как занятое
+        // 3. Проверяем/создаем транспорт
+        Vehicle vehicle = vehicleRepo.findByPlate(plateNumber);
+        if (vehicle == null) {
+            vehicle = new Vehicle(0, plateNumber);
+            vehicleRepo.addVehicle(vehicle);
+            vehicle = vehicleRepo.findByPlate(plateNumber); // Получаем с ID
+        }
+
+        // 4. Создаем бронь
         Reservation res = new Reservation(0, spot.getId(), vehicle.getId(), LocalDateTime.now());
         reservationRepo.create(res);
-        spotRepo.updateStatus(spot.getId(), true);
 
-        System.out.println("Spot " + spot.getSpotNumber() + " succesfully reserved!");
+        // 5. Меняем статус места
+        spotRepo.updateStatus(spot.getId(), true);
     }
 
-    // Освобождение места и расчет стоимости (User Story 2 & 4)
-    public void releaseSpot(String plateNumber) throws ReservationStatusException {
+    /**
+     * User Story: Release a spot & Calculate cost
+     */
+    public void release(String plateNumber) throws Exception {
         Vehicle vehicle = vehicleRepo.findByPlate(plateNumber);
-        if (vehicle == null) throw new ReservationStatusException("Car is not found");
+        if (vehicle == null) throw new Exception("Vehicle not found");
 
         Reservation activeRes = reservationRepo.findActiveByVehicle(vehicle.getId());
-        if (activeRes == null) throw new ReservationStatusException("there is no active reservation");
+        if (activeRes == null) throw new Exception("No active reservation found");
 
-        // Расчет цены
-        double rate = tariffRepo.getRateByName("Standard");
-        LocalDateTime now = LocalDateTime.now();
-        double totalCost = pricingService.calculate(activeRes.getStartTime(), now, rate);
+        // Расчет стоимости
+        double rate = tariffRepo.getStandardRate();
+        LocalDateTime endTime = LocalDateTime.now();
+        double cost = pricingService.calculateCost(activeRes.getStartTime(), endTime, rate);
 
-        // Завершаем в БД
-        reservationRepo.finishReservation(activeRes.getId(), now, totalCost);
+        // Завершаем бронь в БД
+        reservationRepo.finishReservation(activeRes.getId(), endTime, cost);
+
+        // Освобождаем место
         spotRepo.updateStatus(activeRes.getSpotId(), false);
 
-        System.out.println("parking ended. cost: " + totalCost);
+        System.out.println("Spot released! Total cost: " + cost);
     }
 }

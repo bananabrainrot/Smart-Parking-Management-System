@@ -1,3 +1,4 @@
+import edu.aitu.oop3.db.DatabaseCreation;
 import repositories.IParkingSpotRepository;
 import repositories.IReservationRepository;
 import repositories.ITariffRepository;
@@ -12,11 +13,11 @@ import services.ReservationService;
 public class Main {
     public static void main(String[] args) {
         // 1. Инициализируем инфраструктуру
-        IDB db = new PostgresDB();
+        DatabaseCreation.init();
 
         // 2. Создаем репозитории
         IParkingSpotRepository spotRepo = new ParkingSpotRepositoryImpl(db);
-        IVehicleRepository vehicleRepo = new VehicleRepositoryImpl(db);
+        IVehicleRepository vehicleRepo = new VehicleRepositoryImpl(vehiclesDB);
         IReservationRepository resRepo = new ReservationRepositoryImpl(db);
         ITariffRepository tariffRepo = new TariffRepositoryImpl(db);
 

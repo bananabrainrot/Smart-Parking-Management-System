@@ -50,7 +50,7 @@ public class ParkingSpotRepositoryImpl implements IParkingSpotRepository {
         try (Connection conn = db.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setBoolean(1, isOccupied);
+            pstmt.setBo olean(1, isOccupied);
             pstmt.setInt(2, id);
             pstmt.executeUpdate();
 
