@@ -1,84 +1,43 @@
-package services;
+package edu.aitu.oop3.services;
 
 import entities.*;
 import exception.*;
 import repositories.*;
 import java.time.LocalDateTime;
-import java.util.List;
+import services.*;
 
 public class ReservationService {
     private final IParkingSpotRepository spotRepo;
-    private final IVehicleRepository vehicleRepo;
-    private final IReservationRepository reservationRepo;
-    private final ITariffRepository tariffRepo;
+    private final IReservationRepository resRepo;
     private final PricingService pricingService;
 
-    // SOLID: Внедрение зависимостей через конструктор
     public ReservationService(IParkingSpotRepository spotRepo,
-                              IVehicleRepository vehicleRepo,
-                              IReservationRepository reservationRepo,
-                              ITariffRepository tariffRepo,
+                              IReservationRepository resRepo,
                               PricingService pricingService) {
         this.spotRepo = spotRepo;
-        this.vehicleRepo = vehicleRepo;
-        this.reservationRepo = reservationRepo;
-        this.tariffRepo = tariffRepo;
+        this.resRepo = resRepo;
         this.pricingService = pricingService;
     }
 
-    /**
-     * User Story: Reserve a spot
-     */
-    public void reserve(String plateNumber) throws NoFreeSpotsException, InvalidVehiclePlateException {
-        // 1. Простейшая валидация номера
-        if (plateNumber == null || plateNumber.trim().isEmpty()) {
-            throw new InvalidVehiclePlateException(plateNumber);
-        }
+    public void reserveSpot(String plate, int vehicleId) {
+        var freeSpots = spotRepo.getAllFreeSpots();
+        if (freeSpots.isEmpty()) throw new NoFreeSpotsException();
 
-        // 2. Ищем свободное место
-        List<ParkingSpot> freeSpots = spotRepo.getAllFreeSpots();
-        if (freeSpots.isEmpty()) {
-            throw new NoFreeSpotsException();
-        }
         ParkingSpot spot = freeSpots.get(0);
+        Reservation res = new Reservation(0, spot.getId(), vehicleId, LocalDateTime.now());
 
-        // 3. Проверяем/создаем транспорт
-        Vehicle vehicle = vehicleRepo.findByPlate(plateNumber);
-        if (vehicle == null) {
-            vehicle = new Vehicle(0, plateNumber);
-            vehicleRepo.addVehicle(vehicle);
-            vehicle = vehicleRepo.findByPlate(plateNumber); // Получаем с ID
-        }
-
-        // 4. Создаем бронь
-        Reservation res = new Reservation(0, spot.getId(), vehicle.getId(), LocalDateTime.now());
-        reservationRepo.create(res);
-
-        // 5. Меняем статус места
+        resRepo.create(res);
         spotRepo.updateStatus(spot.getId(), true);
     }
 
-    /**
-     * User Story: Release a spot & Calculate cost
-     */
-    public void release(String plateNumber) throws Exception {
-        Vehicle vehicle = vehicleRepo.findByPlate(plateNumber);
-        if (vehicle == null) throw new Exception("Vehicle not found");
+    public void releaseSpot(int vehicleId, double rate) {
+        Reservation res = resRepo.findActiveByVehicle(vehicleId);
+        if (res == null) throw new ReservationStatusException("No active reservation");
 
-        Reservation activeRes = reservationRepo.findActiveByVehicle(vehicle.getId());
-        if (activeRes == null) throw new Exception("No active reservation found");
+        LocalDateTime now = LocalDateTime.now();
+        double cost = pricingService.calculateCost(res.getStartTime(), now, rate);
 
-        // Расчет стоимости
-        double rate = tariffRepo.getStandardRate();
-        LocalDateTime endTime = LocalDateTime.now();
-        double cost = pricingService.calculateCost(activeRes.getStartTime(), endTime, rate);
-
-        // Завершаем бронь в БД
-        reservationRepo.finishReservation(activeRes.getId(), endTime, cost);
-
-        // Освобождаем место
-        spotRepo.updateStatus(activeRes.getSpotId(), false);
-
-        System.out.println("Spot released! Total cost: " + cost);
+        resRepo.finish(res.getId(), now, cost);
+        spotRepo.updateStatus(res.getSpotId(), false);
     }
 }

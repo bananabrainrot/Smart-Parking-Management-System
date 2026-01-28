@@ -13,7 +13,7 @@ public class DatabaseCreation {
         String sql = """
 create table if not exists vehicles (
 id serial primary key,
-plate_number varchar(15);
+plate_number varchar(15)
 );
 """;
         execute(sql);
@@ -23,7 +23,7 @@ plate_number varchar(15);
         String sql= """
                 create table if not exists reservation(
                 id serial primary key,
-                spot_id references parking_spots(id),
+                spot_id int references parking_spots(id),
                 vehicle_id references vehicles(id),
                 start_time timestamp default current_timestamp,
                 end_time timestamp
@@ -34,7 +34,7 @@ plate_number varchar(15);
     private static void parking_spotsDB(){
         String sql= """
                 create table if not exists parking_spots(
-                id serial primary key;
+                id serial primary key
                 spotNumber int,
                 isOccupied boolean not null
                 );

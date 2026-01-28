@@ -1,12 +1,25 @@
 package repositories;
 
-import entities.ParkingSpot;
-import exception.NoFreeSpotsException;
-
+import entities.*;
 import java.util.List;
+import java.time.LocalDateTime;
 
 public interface IParkingSpotRepository {
-    ParkingSpot getFreeSpot() throws NoFreeSpotsException; // Найти одно свободное
-    List<ParkingSpot> getAllFreeSpots(); // Список всех свободных
-    void updateStatus(int id, boolean isOccupied); // Занять или освободить
+    List<ParkingSpot> getAllFreeSpots();
+    void updateStatus(int id, boolean isOccupied);
+}
+
+public interface IVehicleRepository {
+    Vehicle findByPlate(String plate);
+    void add(Vehicle vehicle);
+}
+
+public interface IReservationRepository {
+    void create(Reservation res);
+    Reservation findActiveByVehicle(int vehicleId);
+    void finish(int id, LocalDateTime endTime, double cost);
+}
+
+public interface ITariffRepository {
+    Tariff getByName(String name);
 }
