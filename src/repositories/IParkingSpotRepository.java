@@ -1,25 +1,10 @@
 package repositories;
 
-import entities.*;
+import entities.ParkingSpot;
 import java.util.List;
-import java.time.LocalDateTime;
 
 public interface IParkingSpotRepository {
-    List<ParkingSpot> getAllFreeSpots();
-    void updateStatus(int id, boolean isOccupied);
-}
-
-public interface IVehicleRepository {
-    Vehicle findByPlate(String plate);
-    void add(Vehicle vehicle);
-}
-
-public interface IReservationRepository {
-    void create(Reservation res);
-    Reservation findActiveByVehicle(int vehicleId);
-    void finish(int id, LocalDateTime endTime, double cost);
-}
-
-public interface ITariffRepository {
-    Tariff getByName(String name);
+    List<ParkingSpot> getAllFreeSpots(); // User story: list free spots
+    void updateSpotStatus(int id, boolean isAvailable); // Для заезда/выезда
+    ParkingSpot getById(int id);
 }

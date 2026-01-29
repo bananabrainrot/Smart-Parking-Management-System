@@ -1,12 +1,18 @@
 package entities;
 
-import java.sql.Time;
+import java.math.BigDecimal;
 
 public class Tariff {
     private int id;
-    private String name;
-    private double ratePerHour;
+    private String name; // day / night they will be
+    private BigDecimal ratePerHour;
+    private String vehicleType;
 
+    public Tariff(int id, String name, BigDecimal ratePerHour) {
+        this.id = id;
+        this.name = name;
+        this.ratePerHour = ratePerHour;
+    }
 
     public int getId() {
         return id;
@@ -24,11 +30,19 @@ public class Tariff {
         this.name = name;
     }
 
-    public double getRatePerHour() {
+    public BigDecimal getRatePerHour() {
         return ratePerHour;
     }
 
-    public void setRatePerHour(double ratePerHour) {
+    public void setRatePerHour(BigDecimal ratePerHour) {
         this.ratePerHour = ratePerHour;
+    }
+
+    public String getVehicleType() {
+        return vehicleType;
+    }
+
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType;
     }
 }

@@ -1,61 +1,53 @@
 package edu.aitu.oop3.db;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.SQLException;
 
 public class DatabaseCreation {
-    public static void init(){
-        vehiclesDB();
-        parking_spotsDB();
-        reservationDB();
-        tarifsDB();
-    }
-    private static void vehiclesDB() {
-        String sql = """
-create table if not exists vehicles (
-id serial primary key,
-plate_number varchar(15)
-);
-""";
-        execute(sql);
-    }
 
-    private static void reservationDB(){
-        String sql= """
-                create table if not exists reservation(
-                id serial primary key,
-                spot_id int references parking_spots(id),
-                vehicle_id references vehicles(id),
-                start_time timestamp default current_timestamp,
-                end_time timestamp
-                );
-                """;
-        execute(sql);
-    }
-    private static void parking_spotsDB(){
-        String sql= """
-                create table if not exists parking_spots(
-                id serial primary key
-                spotNumber int,
-                isOccupied boolean not null
-                );
-                """;
-        execute(sql);
-    }
-    private static void tarifsDB(){
-        String sql= """
-                create table if not exists tarifs(
-                name varchar(50) not null,
-                rate_Per_hour int
-                );
-                """;
-        execute(sql);
-    }
-    private static void execute(String sql){
-        try(Connection connection = DatabaseConnection.getConnection(); Statement st = connection.createStatement()){
-            st.execute(sql);
-            System.out.println("Executed:" + sql.split("\\(")[0]);
-        }catch (SQLException e){
-            throw new RuntimeException(e);
+    public static void createTables() {
+        // SQL-запросы для создания таблиц
+        String createSpotsTable = "CREATE TABLE IF NOT EXISTS parking_spots (" +
+                "id SERIAL PRIMARY KEY, " +
+                "spot_number VARCHAR(10) NOT NULL, " +
+                "is_available BOOLEAN DEFAULT TRUE)";
+
+        String createVehiclesTable = "CREATE TABLE IF NOT EXISTS vehicles (" +
+                "id SERIAL PRIMARY KEY, " +
+                "license_plate VARCHAR(20) UNIQUE NOT NULL, " +
+                "owner_name VARCHAR(100), " +
+                "type VARCHAR(50))";
+
+        String createTariffsTable = "CREATE TABLE IF NOT EXISTS tariffs (" +
+                "id SERIAL PRIMARY KEY, " +
+                "name VARCHAR(50), " +
+                "rate_per_hour DECIMAL(10, 2), " +
+                "vehicle_type VARCHAR(50))";
+
+        String createReservationsTable = "CREATE TABLE IF NOT EXISTS reservations (" +
+                "id SERIAL PRIMARY KEY, " +
+                "spot_id INTEGER REFERENCES parking_spots(id), " +
+                "vehicle_id INTEGER REFERENCES vehicles(id), " +
+                "tariff_id INTEGER REFERENCES tariffs(id), " +
+                "start_time TIMESTAMP, " +
+                "end_time TIMESTAMP, " +
+                "total_cost DECIMAL(10, 2), " +
+                "is_active BOOLEAN DEFAULT TRUE)";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            // Выполняем создание каждой таблицы
+            stmt.execute(createSpotsTable);
+            stmt.execute(createVehiclesTable);
+            stmt.execute(createTariffsTable);
+            stmt.execute(createReservationsTable);
+
+            System.out.println("Tables checked/created successfully.");
+
+        } catch (SQLException e) {
+            System.err.println("Error creating tables: " + e.getMessage());
         }
     }
 }

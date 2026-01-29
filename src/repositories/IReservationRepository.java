@@ -1,11 +1,10 @@
 package repositories;
 
 import entities.Reservation;
-
-import java.time.LocalDateTime;
+import java.util.List;
 
 public interface IReservationRepository {
-    void create(Reservation reservation); // Сохранить новую бронь
-    Reservation findActiveByVehicle(int vehicleId); // Найти текущую бронь машины
-    void finishReservation(int id, LocalDateTime endTime, double totalCost); // Закрыть
+    void create(Reservation reservation);
+    void finishReservation(int id, java.math.BigDecimal cost);
+    Reservation findActiveByVehicleId(int vehicleId);
 }
