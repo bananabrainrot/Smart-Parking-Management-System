@@ -7,11 +7,6 @@ public class Tariff {
     private String name;
     private double ratePerHour;
 
-    public Tariff(int id, String name, double ratePerHour) {
-        this.id = id;
-        this.name = name;
-        this.ratePerHour = ratePerHour;
-    }
 
     public int getId() {
         return id;
