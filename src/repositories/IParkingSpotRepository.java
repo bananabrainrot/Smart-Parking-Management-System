@@ -4,7 +4,7 @@ import entities.ParkingSpot;
 import java.util.List;
 
 public interface IParkingSpotRepository {
-    List<ParkingSpot> getAllFreeSpots(); // User story: list free spots
-    void updateSpotStatus(int id, boolean isAvailable); // Для заезда/выезда
+    List<ParkingSpot> getAllFreeSpots();
+    void updateSpotStatus(int id, boolean isAvailable);
     ParkingSpot getById(int id);
 }

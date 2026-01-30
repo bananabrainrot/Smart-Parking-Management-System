@@ -21,7 +21,6 @@ public class PostgresVehicleRepository implements IVehicleRepository {
 
             pstmt.executeUpdate();
 
-            // Получаем сгенерированный базой ID и записываем его в объект
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     vehicle.setId(generatedKeys.getInt(1));
