@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Tariff {
     private int id;
-    private String name; // day / night they will be
+    private String name;
     private BigDecimal ratePerHour;
     private String vehicleType;
 

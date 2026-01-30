@@ -54,6 +54,6 @@ public class PostgresVehicleRepository implements IVehicleRepository {
         } catch (SQLException e) {
             System.err.println("Error finding vehicle: " + e.getMessage());
         }
-        return null; // Если машина не найдена
+        return null;
     }
 }

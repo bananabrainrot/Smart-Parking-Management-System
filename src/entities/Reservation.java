@@ -5,14 +5,14 @@ import java.time.LocalDateTime;
 
 public class Reservation {
     private int id;
-    private int spotId;      // Ссылка на ParkingSpot
-    private int vehicleId;   // Ссылка на Vehicle
-    private int tariffId;    // Ссылка на Tariff (чтобы знать, по какой ставке считать)
+    private int spotId;
+    private int vehicleId;
+    private int tariffId;
 
     private LocalDateTime startTime;
-    private LocalDateTime endTime; // Заполняется, когда машина уезжает
-    private BigDecimal totalCost;  // Итоговая сумма (User story: calculate cost)
-    private boolean isActive;      // Для Exception: reservation already active
+    private LocalDateTime endTime;
+    private BigDecimal totalCost;
+    private boolean isActive;
 
     public Reservation() {
     }

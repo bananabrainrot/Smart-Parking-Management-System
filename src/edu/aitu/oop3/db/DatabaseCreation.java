@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DatabaseCreation {
 
     public static void createTables() {
-        // SQL-запросы для создания таблиц
+
         String createSpotsTable = "CREATE TABLE IF NOT EXISTS parking_spots (" +
                 "id SERIAL PRIMARY KEY, " +
                 "spot_number VARCHAR(10) NOT NULL, " +
@@ -38,7 +38,7 @@ public class DatabaseCreation {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement()) {
 
-            // Выполняем создание каждой таблицы
+
             stmt.execute(createSpotsTable);
             stmt.execute(createVehiclesTable);
             stmt.execute(createTariffsTable);
