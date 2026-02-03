@@ -40,7 +40,8 @@ public class ReservationService {
         if (vehicle == null) throw new InvalidVehiclePlateException("Vehicle not found");
 
         Reservation res = reservationRepo.findActiveByVehicleId(vehicle.getId());
-        if (res == null) throw new ReservationNotFoundException("No active reservation for this car");
+        if (res == null) throw new
+                ReservationNotFoundException("No active reservation for this car");
 
         java.math.BigDecimal rate = java.math.BigDecimal.valueOf(150.00);
         java.math.BigDecimal totalCost = pricingService.calculateCost(
