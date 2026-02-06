@@ -1,26 +1,31 @@
 package repositories.implementations;
 
 import edu.aitu.oop3.db.DatabaseConnection;
+import entities.ListResult;
 import entities.ParkingSpot;
+import entities.SpotFactory;
+import entities.SpotType;
 import repositories.IParkingSpotRepository;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class PostgresParkingSpotRepository implements IParkingSpotRepository {
+    private final SpotFactory spotFactory = new SpotFactory();
 
     @Override
-    public List<ParkingSpot> getAllFreeSpots() {
-        List<ParkingSpot> spots = new ArrayList<>();
+    public ListResult<ParkingSpot> getAllFreeSpots() {
+        ArrayList<ParkingSpot> spots = new ArrayList<>();
         String sql = "SELECT * FROM parking_spots WHERE is_available = TRUE";
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                spots.add(new ParkingSpot(rs.getInt("id"), rs.getString("spot_number"), rs.getBoolean("is_available")));
+                String spotNumber = rs.getString("spot_number");
+                SpotType spotType = SpotType.fromSpotNumber(spotNumber);
+                spots.add(spotFactory.createSpot(spotType, rs.getInt("id"), spotNumber, rs.getBoolean("is_available")));
             }
         } catch (SQLException e) { e.printStackTrace(); }
-        return spots;
+        return new ListResult<>(spots, spots.size());
     }
 
     @Override
@@ -31,7 +36,9 @@ public class PostgresParkingSpotRepository implements IParkingSpotRepository {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return new ParkingSpot(rs.getInt("id"), rs.getString("spot_number"), rs.getBoolean("is_available"));
+                    String spotNumber = rs.getString("spot_number");
+                    SpotType spotType = SpotType.fromSpotNumber(spotNumber);
+                    return spotFactory.createSpot(spotType, rs.getInt("id"), spotNumber, rs.getBoolean("is_available"));
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
