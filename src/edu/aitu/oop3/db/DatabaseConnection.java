@@ -10,8 +10,8 @@ import java.util.Properties;
 
 public class DatabaseConnection {
     private static final String URL =
-            "jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres?sslmode=require";
-    private static final String USER = "postgres.mrivkaqomaorywhzsntk";
+            "jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require";
+    private static final String USER = "postgres.foycqfivqdatcewmblsc";
     private static final String PASSWORD = loadPassword();
 
 
