@@ -2,7 +2,7 @@ import edu.aitu.oop3.db.DatabaseCreation;
 import edu.aitu.oop3.db.DatabaseConnection;
 import repositories.*;
 import repositories.implementations.*;
-import services.ReservationService;
+import services.ParkingLotManager;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -19,7 +19,7 @@ public class Main {
         IVehicleRepository vehicleRepo = new PostgresVehicleRepository();
         IReservationRepository resRepo = new PostgresReservationRepository();
 
-        ReservationService parkingManager = new ReservationService(resRepo, spotRepo, vehicleRepo);
+        ParkingLotManager parkingManager = ParkingLotManager.getInstance(resRepo, spotRepo, vehicleRepo);
         Scanner sc = new Scanner(System.in);
 
         while (true) {
@@ -55,7 +55,7 @@ public class Main {
 
                     case 3:
                         System.out.println("\n--- Free Spots ---");
-                        spotRepo.getAllFreeSpots().forEach(s ->
+                        spotRepo.getAllFreeSpots().getItems().forEach(s ->
                                 System.out.println("ID: " + s.getId() + " | Number: " + s.getSpotNumber()));
                         break;
 
