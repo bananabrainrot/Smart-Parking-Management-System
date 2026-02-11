@@ -1,16 +1,27 @@
 package repositories.implementations;
 
+import config.ParkingPolicy;
 import edu.aitu.oop3.db.DatabaseConnection;
 import entities.ListResult;
 import entities.ParkingSpot;
 import entities.SpotFactory;
 import entities.SpotType;
 import repositories.IParkingSpotRepository;
+
 import java.sql.*;
 import java.util.ArrayList;
 
 public class PostgresParkingSpotRepository implements IParkingSpotRepository {
     private final SpotFactory spotFactory = new SpotFactory();
+    private final ParkingPolicy parkingPolicy;
+
+    public PostgresParkingSpotRepository() {
+        this(new ParkingPolicy.Builder().build());
+    }
+
+    public PostgresParkingSpotRepository(ParkingPolicy parkingPolicy) {
+        this.parkingPolicy = parkingPolicy;
+    }
 
     @Override
     public ListResult<ParkingSpot> getAllFreeSpots() {
@@ -21,10 +32,12 @@ public class PostgresParkingSpotRepository implements IParkingSpotRepository {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 String spotNumber = rs.getString("spot_number");
-                SpotType spotType = SpotType.fromSpotNumber(spotNumber);
+                SpotType spotType = parkingPolicy.resolveSpotType(spotNumber);
                 spots.add(spotFactory.createSpot(spotType, rs.getInt("id"), spotNumber, rs.getBoolean("is_available")));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return new ListResult<>(spots, spots.size());
     }
 
@@ -37,11 +50,13 @@ public class PostgresParkingSpotRepository implements IParkingSpotRepository {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     String spotNumber = rs.getString("spot_number");
-                    SpotType spotType = SpotType.fromSpotNumber(spotNumber);
+                    SpotType spotType = parkingPolicy.resolveSpotType(spotNumber);
                     return spotFactory.createSpot(spotType, rs.getInt("id"), spotNumber, rs.getBoolean("is_available"));
                 }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -53,6 +68,8 @@ public class PostgresParkingSpotRepository implements IParkingSpotRepository {
             pstmt.setBoolean(1, isAvailable);
             pstmt.setInt(2, id);
             pstmt.executeUpdate();
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
