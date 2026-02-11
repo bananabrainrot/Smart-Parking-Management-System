@@ -1,21 +1,29 @@
 package edu.aitu.oop3.db;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DatabaseCreation {
-    // Название метода теперь совпадает с вызовом в Main
     public static void createTables() {
-        parking_spotsDB();
+        parkingSpotsDB();
         vehiclesDB();
-        tariffsDB(); // Сначала создаем их
-        reservationDB(); // Бронирование — в последнюю очередь
+        tariffsDB();
+        reservationDB();
     }
 
     private static void vehiclesDB() {
-        execute("CREATE TABLE IF NOT EXISTS vehicles (id SERIAL PRIMARY KEY, license_plate VARCHAR(15) UNIQUE)");
+        execute("""
+                CREATE TABLE IF NOT EXISTS vehicles (
+                    id SERIAL PRIMARY KEY,
+                    license_plate VARCHAR(15) UNIQUE,
+                    owner_name VARCHAR(100),
+                    type VARCHAR(30)
+                )
+                """);
     }
 
-    private static void parking_spotsDB() {
+    private static void parkingSpotsDB() {
         execute("CREATE TABLE IF NOT EXISTS parking_spots (id SERIAL PRIMARY KEY, spot_number VARCHAR(10) UNIQUE, is_available BOOLEAN DEFAULT TRUE)");
     }
 
@@ -25,15 +33,17 @@ public class DatabaseCreation {
 
     private static void reservationDB() {
         execute("""
-            CREATE TABLE IF NOT EXISTS reservations (
-                id SERIAL PRIMARY KEY,
-                spot_id INT REFERENCES parking_spots(id),
-                vehicle_id INT REFERENCES vehicles(id),
-                start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                end_time TIMESTAMP,
-                total_cost NUMERIC(10, 2)
-            )
-            """);
+                CREATE TABLE IF NOT EXISTS reservations (
+                    id SERIAL PRIMARY KEY,
+                    spot_id INT REFERENCES parking_spots(id),
+                    vehicle_id INT REFERENCES vehicles(id),
+                    tariff_id INT REFERENCES tariffs(id),
+                    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    end_time TIMESTAMP,
+                    total_cost NUMERIC(10, 2),
+                    is_active BOOLEAN DEFAULT TRUE
+                )
+                """);
     }
 
     private static void execute(String sql) {
